@@ -1,0 +1,11 @@
+# Fonts
+[options]
+font = Monospace 9
+#font = xos4 Termius 12px
+#font = Droid Sans Mono 8
+
+# Colors
+[colors]
+foreground = rgba(196, 196, 196, 1)
+background = rgba(0, 0, 0, 0.8)
+
