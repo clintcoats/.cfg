@@ -17,10 +17,10 @@ Config { font = "xft:Inconsolata:size=9:lcdfilter=lcddefault:hintstyle=hintnone:
        , allDesktops = True
        , overrideRedirect = True
        , commands = [ Run Date "%a %b %_d %Y %H:%M:%S" "date" 10
-		    , Run StdinReader
+		    , Run UnsafeStdinReader
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%StdinReader% }\
+       , template = "%UnsafeStdinReader% }\
                     \{ <fc=#cccccc>%date%</fc>"
        }

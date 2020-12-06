@@ -15,6 +15,7 @@ import Data.Monoid
 import Data.Maybe (isJust)
 import Data.Ratio ((%)) -- for video
 import qualified Data.Map as M
+import Data.Tree
 
 -- system
 import System.IO (hPutStrLn) -- for xmobar
@@ -34,12 +35,14 @@ import XMonad.Hooks.EwmhDesktops -- to show workspaces in application switchers
 import XMonad.Hooks.ManageHelpers (isFullscreen, isDialog,  doFullFloat, doCenterFloat, doRectFloat) 
 import XMonad.Hooks.Place (placeHook, withGaps, smart)
 import XMonad.Hooks.UrgencyHook
+import XMonad.Hooks.WorkspaceHistory
 
 -- actions
 import XMonad.Actions.CopyWindow -- for dwm window style tagging
 import XMonad.Actions.UpdatePointer -- update mouse postion
 import XMonad.Actions.Submap -- submaps for keybindings
 import qualified XMonad.Actions.Search as S -- add the ability to search from xmonad
+import XMonad.Actions.TreeSelect -- as TS
 
 -- layout 
 import XMonad.Layout.Renamed (renamed, Rename(Replace))
@@ -76,8 +79,26 @@ myppHidden = "#268bd2"
 myppHiddenNoWindows = "#93A1A1"
 myppTitle = "#FDF6E3"
 myppUrgent = "#DC322F"
-myWorkspaces = ["1","2","3","4","5","6","7","8","9"]
+-- myWorkspaces = ["1","2","3","4","5","6","7","8","9"]
 windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace . W.current . windowset
+
+myWorkspaces = [" dev ", " www ", " sys "] --, " doc ", " vbox ", " chat ", " mus ", " vid ", " gfx "]
+-- myWorkspaces = [" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "]
+
+xmobarEscape :: String -> String
+xmobarEscape = concatMap doubleLts
+  where
+        doubleLts '<' = "<<"
+        doubleLts x   = [x]
+
+myClickableWorkspaces :: [String]
+myClickableWorkspaces = clickable . (map xmobarEscape)
+               -- $ [" 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "]
+               $ [" dev ", " www ", " sys "]  --, " doc ", " vbox ", " chat ", " mus ", " vid ", " gfx "]
+  where
+        clickable l = [ "<action=xdotool key super+" ++ show (n) ++ ">" ++ ws ++ "</action>" |
+                      (i,ws) <- zip [1..3] l,
+                      let n = i ]
 
 ------------------------------------------------------------------------
 -- desktop notifications -- dunst package required
@@ -97,15 +118,15 @@ instance UrgencyHook LibNotifyUrgencyHook where
 ------------------------------------------------------------------------
 
 myStartupHook = do
-      spawnOnce "nitroen --restore &" 
+      -- spawnOnce "/home/clint/.screenlayout/default.sh &"
+      spawnOnce "nitrogen --restore &" 
       spawnOnce "picom &"
-
 
 ------------------------------------------------------------------------
 -- layout
 ------------------------------------------------------------------------
 
-myLayout = avoidStruts (full ||| tiled ||| grid ||| bsp)
+myLayout = avoidStruts (grid ||| tiled ||| bsp ||| full)
   where
      -- full
      full = renamed [Replace "Full"] 
